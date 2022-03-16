@@ -11,6 +11,9 @@
   </head>
 
   <body>
+    <%= button_to "Log out", destroy_user_session_path, method: "delete", data: { turbo: false } if current_user%>
+    <p class="notice"><%= notice %></p>
+    <p class="alert" style="color:red;"><%= alert %></p>
     <%= yield %>
   </body>
 </html>
