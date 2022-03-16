@@ -1,0 +1,13 @@
+<h1>Which Twitcher are you looking for?</h1>
+<%= form_with url: twitch_search_path, data: { turbo: false } do |f| %>
+  <%= f.text_field :search_string %>
+  <%= f.submit "Search" %>
+<% end %>
+<ol>
+<% @result.each do |record| %>
+  <li><p><%= record['display_name'] %></p>
+      <p><%= record['title'] %></p>
+      <p><img src=<%= record['thumbnail_url'] %>></p>
+  </li>
+<% end %>
+</ol>
