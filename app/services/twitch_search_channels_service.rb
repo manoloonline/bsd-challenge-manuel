@@ -1,6 +1,10 @@
-class TwitchSearchChannelsService < ApplicationService
+# frozen_string_literal: true
 
+class TwitchSearchChannelsService < ApplicationService
   private_attr_reader :query_string
+
+  @@access_token = nil
+  @@expiration_token = Time.now
 
   def initialize(query_string)
     @query_string = query_string
@@ -13,22 +17,23 @@ class TwitchSearchChannelsService < ApplicationService
 
     raise Net::HTTPBadResponse, "Bad search twitch API response status #{response.status}" unless response.success?
 
-    JSON.parse(response.body)["data"]
+    JSON.parse(response.body)['data']
   end
 
-
-
-private
+  private
 
   def access_token
-    response = Faraday.post("https://id.twitch.tv/oauth2/token?"\
-                            "client_id=k2id2i9dftkfw4vrs6flyvy4zn6ktw&"\
-                            "client_secret=rgar5nepwm49louf9sayybaq0kfvih&"\
-                            "grant_type=client_credentials")
+    return @@access_token if @@expiration_token > Time.now && @@access_token
+
+    response = Faraday.post('https://id.twitch.tv/oauth2/token?'\
+                            "client_id=#{Rails.application.credentials.dig(:twitch, :client_id)}&"\
+                            "client_secret=#{Rails.application.credentials.dig(:twitch, :client_secret)}&"\
+                            'grant_type=client_credentials')
 
     raise Net::HTTPBadResponse, "Bad auth twitch API response status #{response.status}" unless response.success?
 
-    JSON.parse(response.body)["access_token"]
+    @@expiration_token = Time.now + JSON.parse(response.body)['expires_in'].to_i.seconds
+    @@access_token = JSON.parse(response.body)['access_token']
   end
 
   def url
@@ -38,7 +43,7 @@ private
   def headers
     {
       'Authorization' => "Bearer #{access_token}",
-      'Client-Id'     => 'k2id2i9dftkfw4vrs6flyvy4zn6ktw',
+      'Client-Id' => Rails.application.credentials.dig(:twitch, :client_id)
     }
   end
 end
