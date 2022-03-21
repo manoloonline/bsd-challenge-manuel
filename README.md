@@ -41,3 +41,26 @@ Let us know how we can use it. You could either provide us with a zipped file co
 
 ## Bonus (optional):
 Add an "I'm feeling lucky button" that does a random search, but make sure that same result is not returned twice or that you don't return a page that the user already viewed. Use the user stored history to do so. Since going through the history can potentially be costly, suggest and optionally implement optimization mechanism to avoid hitting the storage every time.
+
+## Manuel's clarifications
+### Prerequisites
+- redis
+- rbenv
+
+To execute and test:
+```
+git clone https://github.com/manoloonline/bsd-challenge-manuel.git
+cd bsd-challenge
+rbenv install 3.1.1
+rbenv local 3.1.1
+bundle
+rails s
+rails test
+```
+
+### Challenge 5
+Persistence in the app has been implemented with paper_trail gem, changes in user model are persistent in versions table and some script or data analist could take the historic needed information.
+### Challenge 6
+Just only basic testing was added, in my opinion I would use rspec + capybara for integration/acceptance test
+### Bonus
+Due to lack of time, this part was not implemented. To improved accesses to storage I would choose store the information with a data structure similar than a hash in memory. More specifically, using a secondary DB like redis and store the whole historical of each client with a key/list structure.
