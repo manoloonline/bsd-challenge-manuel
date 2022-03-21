@@ -1,23 +1,31 @@
 # frozen_string_literal: true
 
 class TwitchSearchChannelsService < ApplicationService
-  private_attr_reader :query_string
+  private_attr_reader :query_string, :cursor, :current_user
+
+  API_SEARCH = 'https://api.twitch.tv/helix/search/channels'
 
   @@access_token = nil
   @@expiration_token = Time.now
 
-  def initialize(query_string)
+  def initialize(query_string, current_user, cursor = nil)
     @query_string = query_string
+    @cursor = cursor
+    @current_user = current_user
   end
 
   def execute
-    return [] unless query_string.present?
+    return {records:[], query_string: query_string, cursor:nil} unless query_string.present?
 
     response = Faraday.get(url, nil, headers)
 
     raise Net::HTTPBadResponse, "Bad search twitch API response status #{response.status}" unless response.success?
 
-    JSON.parse(response.body)['data']
+    current_user.update!(last_search: query_string)
+
+    { records: JSON.parse(response.body)['data'],
+      query_string: query_string,
+      cursor: JSON.parse(response.body)['pagination']['cursor']}
   end
 
   private
@@ -37,7 +45,7 @@ class TwitchSearchChannelsService < ApplicationService
   end
 
   def url
-    "https://api.twitch.tv/helix/search/channels?query=#{query_string}"
+    "#{API_SEARCH}?query=#{query_string}&after=#{cursor}"
   end
 
   def headers

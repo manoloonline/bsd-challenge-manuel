@@ -3,11 +3,22 @@
   <%= f.text_field :search_string %>
   <%= f.submit "Search" %>
 <% end %>
-<ol>
-<% @result.each do |record| %>
-  <li><p><%= record['display_name'] %></p>
-      <p><%= record['title'] %></p>
-      <p><img src=<%= record['thumbnail_url'] %>></p>
-  </li>
+<% @records.each do |record| %>
+  <a href="https://www.twitch.tv/<%= record['broadcaster_login'] %>">
+    <div class="twitcher_card">
+      <h2 style='text-align: center;'><%= record['display_name'] %></h2>
+      <p style='text-align: center;'><%= record['title'] %></p>
+      <p style='text-align: center;'><img src=<%= record['thumbnail_url'] %>></p>
+    </div>
+  </a>
 <% end %>
-</ol>
+
+<div style='text-align: center;'>
+<% if @search_string && @cursor %>
+  <%= form_with url: twitch_search_path, data: { turbo: false } do |f| %>
+    <%= f.hidden_field :search_string, value: @search_string %>
+    <%= f.hidden_field :cursor, value: @cursor %>
+    <%= f.submit "Next" %>
+  <% end %>
+<% end %>
+</div>
