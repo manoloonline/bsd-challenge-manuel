@@ -44,9 +44,11 @@ Add an "I'm feeling lucky button" that does a random search, but make sure that 
 
 ## Manuel's clarifications
 ### Prerequisites
+Native:
 - redis
 - rbenv
-or
+
+Docker:
 - Docker
 
 To execute and test in native:
