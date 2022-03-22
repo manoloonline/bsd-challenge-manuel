@@ -3,6 +3,10 @@
   <%= f.text_field :search_string %>
   <%= f.submit "Search" %>
 <% end %>
+<br/>
+<%= form_with url: twitch_lucky_path, data: { turbo: false } do |f| %>
+  <%= f.submit "I'm feeling lucky" %>
+<% end %>
 <% @records.each do |record| %>
   <a href="https://www.twitch.tv/<%= record['broadcaster_login'] %>">
     <div class="twitcher_card">

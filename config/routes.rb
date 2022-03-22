@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   
   get 'twitch/search'
   post 'twitch/search'
+  get 'twitch/lucky'
+  post 'twitch/lucky'
+  
   namespace :api do
     get 'greetings/hello' 
   end

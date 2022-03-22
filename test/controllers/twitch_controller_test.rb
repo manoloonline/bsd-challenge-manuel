@@ -22,5 +22,13 @@ class TwitchControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div.twitcher_card', { :count => 20 }
   end
+
+  test "should post lucky logged " do
+    sign_in users(:regular)
+    post twitch_lucky_url
+
+    assert_response :success
+    assert_select 'div.twitcher_card', { :count => 1 }
+  end
 end
 

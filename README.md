@@ -46,8 +46,10 @@ Add an "I'm feeling lucky button" that does a random search, but make sure that 
 ### Prerequisites
 - redis
 - rbenv
+or
+- Docker
 
-To execute and test:
+To execute and test in native:
 ```
 git clone https://github.com/manoloonline/bsd-challenge-manuel.git
 cd bsd-challenge
@@ -57,10 +59,24 @@ bundle
 rails s
 rails test
 ```
+To execute and test in docker:
+```
+git clone https://github.com/manoloonline/bsd-challenge-manuel.git
+cd bsd-challenge
+docker-compose up
+docker-compose -f docker-compose.test.yml up
+```
 
+### Challenge 3
+I have encapsulated the logic in a service object pattern. In this case, I have stored autheticatication token and expiration time in class variables (singleton pattern), it is not a problem with several instances of the application because old tokens are not revoked when a new token is generated.
 ### Challenge 5
 Persistence in the app has been implemented with paper_trail gem, changes in user model are persistent in versions table and some script or data analist could take the historic needed information.
 ### Challenge 6
-Just only basic testing was added, in my opinion I would use rspec + capybara for integration/acceptance test
+Due to lack of time, just only basic testing was added in controllers, in my opinion I would implement services test and I would use rspec + capybara for integration/acceptance test
 ### Bonus
-Due to lack of time, this part was not implemented. To improved accesses to storage I would choose store the information with a data structure similar than a hash in memory. More specifically, using a secondary DB like redis and store the whole historical of each client with a key/list structure.
+To improved accesses to storage I choose store the history info a hash in memory. More specifically, using a secondary DB like redis and store the whole historical of each client with a key/list structure.
+### Comments
+- This assesment was focused in the backend not in the frontend, for this reason any front JS framework was not integrated.
+- master.key file it is included in git to make the app run.
+- Mocking for external calls should be implemented (not allowed in rspec)
+- A test DB or diferentiator should be included in redis to not affect results in "Lucky search" in local executions.

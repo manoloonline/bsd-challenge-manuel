@@ -1,0 +1,31 @@
+# Variables are extracted from .env or environment variables
+x-app-config: &app_config
+  image: "bsd-image"
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      RUBY_VERSION: ${BSD_RUBY_VERSION}
+      ALPINE_VERSION: ${BSD_ALPINE_VERSION}
+version: "3"
+services:
+  redis:
+    image: "redis:${BSD_REDIS_VERSION}-alpine"
+    networks:
+      - bsd-network
+    ports:
+      - "6379:6379"
+  web:
+    <<: *app_config
+    command: bundle exec rails test
+    environment:
+      REDIS_URL: "redis://redis:6379"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    networks:
+      - bsd-network
+
+networks:
+  bsd-network:

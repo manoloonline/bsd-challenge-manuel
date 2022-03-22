@@ -15,17 +15,21 @@ class TwitchSearchChannelsService < ApplicationService
   end
 
   def execute
-    return {records:[], query_string: query_string, cursor:nil} unless query_string.present?
+    return { records: [], query_string:, cursor: nil } unless query_string.present?
 
     response = Faraday.get(url, nil, headers)
 
     raise Net::HTTPBadResponse, "Bad search twitch API response status #{response.status}" unless response.success?
 
-    current_user.update!(last_search: query_string)
+    body = JSON.parse(response.body)
+    twitchers_list = body['data'].pluck('id')
 
-    { records: JSON.parse(response.body)['data'],
-      query_string: query_string,
-      cursor: JSON.parse(response.body)['pagination']['cursor']}
+    current_user.update!(last_search: query_string)
+    add_history(current_user, twitchers_list)
+
+    { records: body['data'],
+      query_string:,
+      cursor: body['pagination']['cursor'] }
   end
 
   private
@@ -53,5 +57,11 @@ class TwitchSearchChannelsService < ApplicationService
       'Authorization' => "Bearer #{access_token}",
       'Client-Id' => Rails.application.credentials.dig(:twitch, :client_id)
     }
+  end
+
+  def add_history(user, twitchers_list)
+    twitchers_list.each do |twitcher|
+      $redis.zadd("history:#{user.id}", 1, twitcher)
+    end
   end
 end
